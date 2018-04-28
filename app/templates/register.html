@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+            <div class="col-5 alert alert-danger alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+    <div class="row justify-content-center">
+        <form class="col-5" action="" method="post">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                <label for="login">{{ form.login.label }}</label>
+                {{ form.login(class='form-control', size=32, **{'aria-describedby':'login_errors'}) }}
+                <small id="login_errors" class="form-text text-danger">
+                    {% for error in form.login.errors %}
+                        {{ error }}<br>
+                    {% endfor %}
+                </small>
+            </div>
+            <div class="form-group">
+                <label for="email">{{ form.email.label }}</label>
+                {{ form.email(class='form-control', size=32, **{'aria-describedby':'email_errors', 'type':'email'}) }}
+                <small id="email_errors" class="form-text text-danger">
+                    {% for error in form.email.errors %}
+                        {{ error }}<br>
+                    {% endfor %}
+                </small>
+            </div>
+            <div class="form-group">
+                <label for="password">{{ form.password.label }}</label>
+                {{ form.password(class='form-control', size=32, **{'aria-describedby':'password_errors'}) }}
+                <small id="password_errors" class="form-text text-danger">
+                    {% for error in form.password.errors %}
+                        {{ error }}<br>
+                    {% endfor %}
+                </small>
+            </div>
+            <div class="form-group">
+                <label for="password2">{{ form.password2.label }}</label>
+                {{ form.password2(class='form-control', size=32, **{'aria-describedby':'password2_errors'}) }}
+                <small id="password2_errors" class="form-text text-danger">
+                    {% for error in form.password2.errors %}
+                        {{ error }}<br>
+                    {% endfor %}
+                </small>
+            </div>
+            <div class="form-group">
+                <label for="name">{{ form.name.label }}</label>
+                {{ form.name(class='form-control', size=32, **{'aria-describedby':'name_errors'}) }}
+                <small id="name_errors" class="form-text text-danger">
+                    {% for error in form.name.errors %}
+                        {{ error }}<br>
+                    {% endfor %}
+                </small>
+            </div>
+            <div class="form-group">
+                <label for="surname">{{ form.surname.label }}</label>
+                {{ form.surname(class='form-control', size=32, **{'aria-describedby':'surname_errors'}) }}
+                <small id="surname_errors" class="form-text text-danger">
+                    {% for error in form.surname.errors %}
+                        {{ error }}<br>
+                    {% endfor %}
+                </small>
+            </div>
+            <div class="form-group">
+                <label for="age">{{ form.age.label }}</label>
+                {{ form.age(class='form-control', **{'aria-describedby':'age_errors'}) }}
+                <small id="age_errors" class="form-text text-danger">
+                    {% for error in form.age.errors %}
+                        {{ error }}<br>
+                    {% endfor %}
+                </small>
+            </div>
+            <div class="form-group">
+                <label for="sex">{{ form.sex.label }}</label>
+                {{ form.sex(class='form-control', **{'aria-describedby':'sex_errors'}) }}
+                <small id="sex_errors" class="form-text text-danger">
+                    {% for error in form.sex.errors %}
+                        {{ error }}<br>
+                    {% endfor %}
+                </small>
+            </div>
+            <div class="form-group">
+                <label for="city">{{ form.city.label }}</label>
+                {{ form.city(class='form-control', size=32, **{'aria-describedby':'city_errors'}) }}
+                <small id="city_errors" class="form-text text-danger">
+                    {% for error in form.city.errors %}
+                        {{ error }}<br>
+                    {% endfor %}
+                </small>
+            </div>
+            
+            {{ form.submit(class='btn btn-primary') }}
+        </form>
+    </div>
+</div>
+{% endblock %}
