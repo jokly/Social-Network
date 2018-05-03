@@ -62,7 +62,7 @@ def register():
             file_name = secure_filename(form.login.data)
             file_ext = avatar.filename.split('.')[-1]
             full_file_name = file_name + '.' + file_ext
-            img_path = os.path.join(app.config['UPLOAD_FOLDER'], 'avatars', full_file_name)
+            img_path = os.path.join(app.config['AVATARS_FOLDER'], full_file_name)
             avatar.save(img_path)
 
         flash('Congratulations, you are now a registered user!')
@@ -72,7 +72,7 @@ def register():
 
 @app.route('/uploads/<path:file_path>')
 def uploaded_file(file_path):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], file_path)
+    return send_from_directory(app.config['STATIC_FOLDER'], file_path)
 
 @app.route('/user/<login>')
 @login_required
