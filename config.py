@@ -1,4 +1,5 @@
 import os
+from os.path import join, dirname, realpath
 
 class Config(object):
     SECRET_KEY = 'test-secret-key'
@@ -9,3 +10,4 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://{user}:{pw}@{url}/{db}'.format(
         user=POSTGRES_USER,pw=POSTGRES_PW,url=POSTGRES_URL,db=POSTGRES_DB)
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    UPLOAD_FOLDER = join(dirname(realpath(__file__)), 'app', 'uploads')

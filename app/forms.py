@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SelectField, IntegerField, BooleanField, SubmitField
+from flask_wtf.file import FileAllowed
+from wtforms import StringField, PasswordField, SelectField, IntegerField, BooleanField, FileField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 from app.models import User
 
@@ -20,6 +21,7 @@ class RegistrationForm(FlaskForm):
     age = IntegerField('Age', validators=[DataRequired()])
     sex = SelectField('Sex', validators=[DataRequired()], choices=[('male', 'Male'), ('female', 'Female')])
     city = StringField('City', validators=[DataRequired()])
+    avatar = FileField('Avatar file', validators=[FileAllowed(['jpg', 'png'], 'Images only')])
     submit = SubmitField('Register')
 
     def validate_login(self, login):

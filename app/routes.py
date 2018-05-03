@@ -1,6 +1,8 @@
-from flask import render_template, flash, redirect, url_for, request
-from flask_login import current_user, login_user, logout_user
+import os
+from flask import render_template, flash, redirect, url_for, request, send_from_directory
+from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
+from werkzeug.utils import secure_filename
 from app import app, db
 from app.forms import LoginForm, RegistrationForm
 from app.models import User
@@ -54,7 +56,27 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
+
+        if form.avatar.data:
+            avatar = request.files['avatar']
+            file_name = secure_filename(form.login.data)
+            file_ext = avatar.filename.split('.')[-1]
+            full_file_name = file_name + '.' + file_ext
+            img_path = os.path.join(app.config['UPLOAD_FOLDER'], 'avatars', full_file_name)
+            avatar.save(img_path)
+
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
 
     return render_template('register.html', title='Register', form=form)
+
+@app.route('/uploads/<path:file_path>')
+def uploaded_file(file_path):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], file_path)
+
+@app.route('/user/<login>')
+@login_required
+def user(login):
+    user = User.query.filter_by(login=login).first_or_404()
+
+    return render_template('user.html', user=user)
