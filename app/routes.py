@@ -78,5 +78,6 @@ def uploaded_file(file_path):
 @login_required
 def user(login):
     user = User.query.filter_by(login=login).first_or_404()
+    page_title = user.name + ' ' + user.surname
 
-    return render_template('user.html', user=user)
+    return render_template('user.html', title=page_title, user=user)
