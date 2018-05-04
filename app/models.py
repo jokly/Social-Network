@@ -2,6 +2,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from flask import url_for
 from datetime import datetime
+import os
 from app import db, login
 
 class User(UserMixin, db.Model):
@@ -24,6 +25,14 @@ class User(UserMixin, db.Model):
 
     def user_url(self):
         return url_for('user', login=self.login)
+
+    def avatar_url(self):
+        file_name = self.login + '.jpg'
+
+        if not os.path.isfile('app/static/avatars/' + file_name):
+            file_name = 'no_avatar.jpg'
+
+        return url_for('static', filename='avatars/' + file_name)
 
     def __repr__(self):
         return '<User {}>'.format(self.login) 
