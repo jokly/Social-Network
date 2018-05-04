@@ -8,7 +8,17 @@
                     src="{{ url_for('static', filename='avatars/' + user.login + '.jpg') }}" style="max-height: 300px">
             </div>
             <div class="col-8">
-                <h2>{{ user.name }}  {{ user.surname }}</h2><br>
+                <h2>
+                    {{ user.name }}  {{ user.surname }}<br>
+                    <small class="text-muted h6">
+                        Last seen: 
+                        {% if user.last_seen %}
+                            {{ user.last_seen }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </small>
+                </h2><br>
                 <strong>Пол: </strong>{{ user.sex }}<br>
                 <strong>Возраст: </strong>{{ user.age }}<br>
                 <strong>Город: </strong>{{ user.city }}<br>

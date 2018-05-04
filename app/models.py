@@ -1,6 +1,7 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from flask import url_for
+from datetime import datetime
 from app import db, login
 
 class User(UserMixin, db.Model):
@@ -13,6 +14,7 @@ class User(UserMixin, db.Model):
     age = db.Column(db.Integer)
     sex = db.Column(db.String(32))
     city = db.Column(db.String(64))
+    last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
