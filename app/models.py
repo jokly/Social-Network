@@ -1,5 +1,6 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from flask import url_for
 from app import db, login
 
 class User(UserMixin, db.Model):
@@ -18,6 +19,9 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def user_url(self):
+        return url_for('user', login=self.login)
 
     def __repr__(self):
         return '<User {}>'.format(self.login) 
