@@ -21,7 +21,7 @@ class RegistrationForm(FlaskForm):
     age = IntegerField('Age', validators=[DataRequired()])
     sex = SelectField('Sex', validators=[DataRequired()], choices=[('male', 'Male'), ('female', 'Female')])
     city = StringField('City', validators=[DataRequired()])
-    avatar = FileField('Avatar file', validators=[FileAllowed(['jpg', 'png'], 'Images only')])
+    avatar = FileField('Avatar file', validators=[FileAllowed(['jpg'], 'Images only')])
     submit = SubmitField('Register')
 
     def validate_login(self, login):
