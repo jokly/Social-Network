@@ -14,8 +14,7 @@ class RegistrationForm(FlaskForm):
     login = StringField('Login', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
-    password2 = PasswordField('Repeat Password', validators=[DataRequired(),
-        EqualTo('password')])
+    password2 = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
     name = StringField('Name', validators=[DataRequired()])
     surname = StringField('Surname', validators=[DataRequired()])
     age = IntegerField('Age', validators=[DataRequired()])
@@ -34,3 +33,13 @@ class RegistrationForm(FlaskForm):
 
         if age <= 0 or age > 100:
             raise ValidationError('Invalid age')
+
+class EditProfileForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    name = StringField('Name', validators=[DataRequired()])
+    surname = StringField('Surname', validators=[DataRequired()])
+    age = IntegerField('Age', validators=[DataRequired()])
+    sex = SelectField('Sex', validators=[DataRequired()], choices=[('male', 'Male'), ('female', 'Female')])
+    city = StringField('City', validators=[DataRequired()])
+    avatar = FileField('Avatar file', validators=[FileAllowed(['jpg'], 'Images only')])
+    submit = SubmitField('Submit')

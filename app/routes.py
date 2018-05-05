@@ -5,7 +5,7 @@ from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from app import app, db
-from app.forms import LoginForm, RegistrationForm
+from app.forms import LoginForm, RegistrationForm, EditProfileForm
 from app.models import User
 
 @app.before_request
@@ -88,3 +88,13 @@ def user(login):
     page_title = user.name + ' ' + user.surname
 
     return render_template('user.html', title=page_title, user=user)
+
+@app.route('/edit_profile')
+@login_required
+def edit_profile():
+    form = EditProfileForm()
+
+    if form.validate_on_submit():
+        pass
+
+    return render_template('edit_profile.html', title='Edit profile', form=form)

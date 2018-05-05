@@ -32,7 +32,7 @@ class User(UserMixin, db.Model):
         if not os.path.isfile('app/static/avatars/' + file_name):
             file_name = 'no_avatar.jpg'
 
-        return url_for('static', filename='avatars/' + file_name)
+        return url_for(app.config['STATIC_FOLDER'], filename='avatars/' + file_name)
 
     def __repr__(self):
         return '<User {}>'.format(self.login) 
