@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed
 from wtforms import StringField, PasswordField, SelectField, IntegerField, BooleanField, FileField, SubmitField
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, NumberRange
 from app.models import User
 
 class LoginForm(FlaskForm):
@@ -17,7 +17,7 @@ class RegistrationForm(FlaskForm):
     password2 = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
     name = StringField('Name', validators=[DataRequired()])
     surname = StringField('Surname', validators=[DataRequired()])
-    age = IntegerField('Age', validators=[DataRequired()])
+    age = IntegerField('Age', validators=[DataRequired(), NumberRange(1, 100, 'Invalid age')])
     sex = SelectField('Sex', validators=[DataRequired()], choices=[('male', 'Male'), ('female', 'Female')])
     city = StringField('City', validators=[DataRequired()])
     avatar = FileField('Avatar file', validators=[FileAllowed(['jpg'], 'Images only')])
@@ -27,12 +27,6 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(login=login.data).first()
         if user is not None:
             raise ValidationError('Please use a different login')
-
-    def validate_age(self, age):
-        age = int(age.data)
-
-        if age <= 0 or age > 100:
-            raise ValidationError('Invalid age')
 
 class EditProfileForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])

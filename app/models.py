@@ -3,7 +3,7 @@ from flask_login import UserMixin
 from flask import url_for
 from datetime import datetime
 import os
-from app import db, login
+from app import db, login, app
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -27,7 +27,7 @@ class User(UserMixin, db.Model):
         return url_for('user', login=self.login)
 
     def avatar_url(self):
-        file_name = self.login + '.jpg'
+        file_name = '{}.jpg'.format(self.id)
 
         if not os.path.isfile('app/static/avatars/' + file_name):
             file_name = 'no_avatar.jpg'

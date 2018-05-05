@@ -66,10 +66,8 @@ def register():
 
         if form.avatar.data:
             avatar = request.files['avatar']
-            file_name = secure_filename(form.login.data)
-            file_ext = avatar.filename.split('.')[-1]
-            full_file_name = file_name + '.' + file_ext
-            img_path = os.path.join(app.config['AVATARS_FOLDER'], full_file_name)
+            file_name = '{}.jpg'.format(user.id)
+            img_path = os.path.join(app.config['AVATARS_FOLDER'], file_name)
             avatar.save(img_path)
 
         flash('Congratulations, you are now a registered user!')
