@@ -24,6 +24,12 @@
                 <strong>Возраст: </strong>{{ user.age }}<br>
                 <strong>Город: </strong>{{ user.city }}<br>
                 <strong>E-mail: </strong>{{ user.email }}<br>
+
+                <br>
+
+                {% if user.login == current_user.login %}
+                    <a class="btn btn-primary" href="{{ url_for('edit_profile') }}" role="button">Edit profile</a>
+                {% endif %}
             </div>
         </div>
     </div>

@@ -1,5 +1,6 @@
 {% macro render_field(field) -%}
 
+{% set default_value = kwargs.pop('default_value', '')  %}
 {% set with_label = kwargs.pop('with_label', False) %}
 {% set placeholder = kwargs.pop('placeholder', field.label.text) %}
 {% set class_ = kwargs.pop('class_', '') %}
@@ -42,11 +43,15 @@
 
         {% if field.type == 'SelectField' %}
 
-            {{ field(class_=class_ + ' form-control', **kwargs) }}
+            {{ field(class_=class_ + ' form-control', default=default_value, **kwargs) }}
 
         {% else %}
 
-            {{ field(class_=class_, placeholder=placeholder, **kwargs) }}
+            {% if field.type == 'SubmitField' %}
+                {{ field(class_=class_, placeholder=placeholder, **kwargs) }}
+            {% else %}
+                {{ field(class_=class_, placeholder=placeholder, value=default_value, **kwargs) }}
+            {% endif %}
 
         {% endif %}
 

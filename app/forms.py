@@ -33,7 +33,5 @@ class EditProfileForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     surname = StringField('Surname', validators=[DataRequired()])
     age = IntegerField('Age', validators=[DataRequired()])
-    sex = SelectField('Sex', validators=[DataRequired()], choices=[('male', 'Male'), ('female', 'Female')])
     city = StringField('City', validators=[DataRequired()])
-    avatar = FileField('Avatar file', validators=[FileAllowed(['jpg'], 'Images only')])
     submit = SubmitField('Submit')

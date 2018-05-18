@@ -89,12 +89,17 @@ def user(login):
 
     return render_template('user.html', title=page_title, user=user)
 
-@app.route('/edit_profile')
+@app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
     form = EditProfileForm()
 
     if form.validate_on_submit():
-        pass
+        User.query.filter_by(id=current_user.id).update(dict(email=form.email.data,
+            name=form.name.data, surname=form.surname.data, age=form.age.data, city=form.city.data))
+        
+        db.session.commit()
 
-    return render_template('edit_profile.html', title='Edit profile', form=form)
+        return redirect(url_for('user', login=current_user.login))
+
+    return render_template('edit_profile.html', title='Edit profile', form=form, user=current_user)
