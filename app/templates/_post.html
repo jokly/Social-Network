@@ -7,7 +7,7 @@
     </a>
     <div class="media-body">
         <div style="min-height: 30px;">
-            {{ post.text }}<br>
+            {{ post.text | safe }}<br>
             {% if img_url is not none %}
                 <img class="rounded mt-1" src="{{ img_url }}" alt="Post image" style="width: 100%;"><br>
             {% endif %}
@@ -15,7 +15,7 @@
         <div class="mt-2">
             <span class="badge badge-pill badge-primary">{{ post.timestamp }}</span>
             <a href="{{ author_info['url'] }}">
-                <span class="badge badge-pill badge-primary">{{ author_info['login'] }}</span>
+                <span class="badge badge-pill badge-primary">{{ author_info['login'] | safe }}</span>
             </a>
         </div>
     </div>
