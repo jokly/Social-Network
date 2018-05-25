@@ -20,13 +20,10 @@
                         {% endif %}
                     </small>
                 </h2><br>
-                <strong>Пол: </strong>{{ user.sex }}<br>
-                <strong>Возраст: </strong>{{ user.age }}<br>
-                <strong>Город: </strong>{{ user.city }}<br>
-                <strong>E-mail: </strong>{{ user.email }}<br>
-
-                <br>
-
+                <strong>Male: </strong>{{ user.sex }}<br>
+                <strong>Age: </strong>{{ user.age }}<br>
+                <strong>City: </strong>{{ user.city }}<br>
+                <strong>E-mail: </strong>{{ user.email }}<br><br>
                 {% if user.login == current_user.login %}
                     <a class="btn btn-primary" href="{{ url_for('edit_profile') }}" role="button">Edit profile</a>
                 {% endif %}
