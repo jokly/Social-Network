@@ -123,5 +123,6 @@ pyvenv.cfg
 !.vscode/extensions.json
 .history
 
+**/*.jpg
 
 # End of https://www.gitignore.io/api/venv,python,visualstudiocode
