@@ -12,3 +12,4 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     STATIC_FOLDER = 'static'
     AVATARS_FOLDER = join(dirname(realpath(__file__)), 'app', STATIC_FOLDER, 'avatars')
+    POSTS_IMG_FOLDER = join(dirname(realpath(__file__)), 'app', STATIC_FOLDER, 'posts_img')

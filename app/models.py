@@ -27,12 +27,7 @@ class User(UserMixin, db.Model):
         return url_for('user', login=self.login)
 
     def avatar_url(self):
-        file_name = '{}.jpg'.format(self.id)
-
-        if not os.path.isfile('app/static/avatars/' + file_name):
-            file_name = 'no_avatar.jpg'
-
-        return url_for(app.config['STATIC_FOLDER'], filename='avatars/' + file_name)
+        return user_avatar_url(self.id)
 
     def __repr__(self):
         return '<User {}>'.format(self.login) 
@@ -40,3 +35,36 @@ class User(UserMixin, db.Model):
 @login.user_loader
 def loader_user(id):
     return User.query.get(int(id))
+
+def user_avatar_url(user_id):
+    file_name = '{}.jpg'.format(user_id)
+
+    if not os.path.isfile('app/static/avatars/' + file_name):
+        file_name = 'no_avatar.jpg'
+
+    return url_for(app.config['STATIC_FOLDER'], filename='avatars/' + file_name)
+    
+
+class Post(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.String(500))
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    author = db.Column(db.Integer, db.ForeignKey('user.id'))
+    parent_post = db.Column(db.Integer, db.ForeignKey('post.id'))
+
+    def author_avatar_url(self):
+        return user_avatar_url(self.author)
+
+    def author_info(self):
+        user_login = User.query.filter_by(id=self.author).first().login
+
+        return {'login': user_login,
+                'url': url_for('user', login=user_login)}
+
+    def img_url(self):
+        file_name = '{}.jpg'.format(self.id)
+
+        if not os.path.isfile('app/static/posts_img/' + file_name):
+            return None
+
+        return url_for(app.config['STATIC_FOLDER'], filename='posts_img/' + file_name)

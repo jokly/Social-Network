@@ -5,8 +5,8 @@ from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, EditProfileForm
-from app.models import User
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, AddPostForm
+from app.models import User, Post
 
 @app.before_request
 def before_request():
@@ -14,10 +14,29 @@ def before_request():
         current_user.last_seen = datetime.utcnow()
         db.session.commit()
 
+def save_file(file_name, file_folder, file_data):
+    file_name = '{}.jpg'.format(file_name)
+    img_path = os.path.join(app.config[file_folder], file_name)
+    file_data.save(img_path)
+
 @app.route('/')
-@app.route('/index')
+@app.route('/index', methods=['GET', 'POST'])
+@login_required
 def index():
-    return render_template('index.html', title='Home')
+    add_post_form = AddPostForm()
+
+    if add_post_form.validate_on_submit():
+        post = Post(text=add_post_form.text.data, author=current_user.id)
+        db.session.add(post)
+        db.session.commit()
+
+        if add_post_form.img.data:
+            save_file(post.id, 'POSTS_IMG_FOLDER', request.files['img'])
+
+    if current_user.is_authenticated:
+        posts = Post.query.order_by(Post.timestamp.desc()).all()
+
+    return render_template('index.html', title='Home', add_post_form=add_post_form, posts=posts)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -65,10 +84,7 @@ def register():
         db.session.commit()
 
         if form.avatar.data:
-            avatar = request.files['avatar']
-            file_name = '{}.jpg'.format(user.id)
-            img_path = os.path.join(app.config['AVATARS_FOLDER'], file_name)
-            avatar.save(img_path)
+            save_file(user.id, 'AVATARS_FOLDER', request.files['avatar'])
 
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))

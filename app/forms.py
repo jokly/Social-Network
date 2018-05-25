@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed
-from wtforms import StringField, PasswordField, SelectField, IntegerField, BooleanField, FileField, SubmitField
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, NumberRange
+from wtforms import StringField, PasswordField, SelectField, IntegerField, BooleanField, FileField, TextAreaField, SubmitField
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, NumberRange, Length
 from app.models import User
 
 class LoginForm(FlaskForm):
@@ -34,4 +34,9 @@ class EditProfileForm(FlaskForm):
     surname = StringField('Surname', validators=[DataRequired()])
     age = IntegerField('Age', validators=[DataRequired(), NumberRange(1, 100, 'Invalid age')])
     city = StringField('City', validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
+class AddPostForm(FlaskForm):
+    text = TextAreaField('Text', validators=[DataRequired(), Length(3, 500, 'Invalid post length')])
+    img = FileField('Attach image', validators=[FileAllowed(['jpg'], 'Images only')])
     submit = SubmitField('Submit')

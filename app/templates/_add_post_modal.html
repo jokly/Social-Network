@@ -1,0 +1,25 @@
+{% import '_macros.html' as macros %}
+
+<div class="modal fade" id="add_post_form" tabindex="-1" role="dialog" aria-labelledby="add_post_form_title" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="add_post_form_title">New Post</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+                <form action="" method="post" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        {{ add_post_form.hidden_tag() }}
+
+                        {{ macros.render_field(add_post_form.text, with_label=True) }}
+                        {{ macros.render_field(add_post_form.img, with_label=True) }}
+                    </div>
+                    <div class="modal-footer">
+                        {{ macros.render_field(add_post_form.submit) }}
+                    </div>
+                </form>
+        </div>
+    </div>
+</div>

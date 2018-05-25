@@ -1,5 +1,20 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-7">
+            <button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#add_post_form">
+                Add post
+            </button>
+            {% include '_add_post_modal.html' %}
+        </div>
 
+        <div class="col-6 mt-5 mb-5">
+            {% for post in posts %}
+                {% include '_post.html' %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
 {% endblock %}
