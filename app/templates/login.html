@@ -6,7 +6,7 @@
     {% include '_flash.html' %}
 
     <div class="row justify-content-center">
-        <form class="col-5" action="" method="post">
+        <form class="col-5 bg-white rounded pt-2" action="" method="post">
             {{ form.hidden_tag() }}
             {{ macros.render_field(form.login, with_label=True) }}
             {{ macros.render_field(form.password, with_label=True) }}

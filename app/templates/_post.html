@@ -1,7 +1,7 @@
 {% set author_info = post.author_info() %}
 {% set img_url = post.img_url() %}
 
-<div class="media border border-secondary rounded-right p-2 mt-3">
+<div class="media bg-white border rounded-right p-2 mt-3">
     <a href="{{ author_info['url'] }}">
         <img class="mr-3 rounded-circle" src="{{ post.author_avatar_url() }}" alt="Author" style="width: 64px; height: 64px">
     </a>

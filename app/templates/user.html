@@ -3,10 +3,12 @@
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-8 row">
+        <div class="col-8 row bg-white rounded pt-4 pb-4">
             <div class="col-4">
-                <img class="img-fluid img-thumbnail"
-                    src="{{ user.avatar_url() }}" style="max-height: 300px">
+                <img id="user_avatar" class="img-fluid"
+                    src="{{ user.avatar_url() }}" style="max-width: 100%">
+                
+                <button type="button" class="btn btn-primary btn-lg btn-block" style="border-top-left-radius: 0; border-top-right-radius: 0;">Upload</button>
             </div>
             <div class="col-8">
                 <h2>
