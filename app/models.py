@@ -56,15 +56,21 @@ class Post(db.Model):
         return user_avatar_url(self.author)
 
     def author_info(self):
-        user_login = User.query.filter_by(id=self.author).first().login
-
-        return {'login': user_login,
-                'url': url_for('user', login=user_login)}
+        return user_info(self.author)
 
     def img_url(self):
-        file_name = '{}.jpg'.format(self.id)
+        return post_img_url(self.id)
 
-        if not os.path.isfile('app/static/posts_img/' + file_name):
-            return None
+def user_info(user_id):
+    user_login = User.query.filter_by(id=user_id).first().login
 
-        return url_for(app.config['STATIC_FOLDER'], filename='posts_img/' + file_name)
+    return {'login': user_login,
+            'url': url_for('user', login=user_login)}
+
+def post_img_url(post_id):
+    file_name = '{}.jpg'.format(post_id)
+
+    if not os.path.isfile('app/static/posts_img/' + file_name):
+        return None
+
+    return url_for(app.config['STATIC_FOLDER'], filename='posts_img/' + file_name)

@@ -1,14 +1,8 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed
-from wtforms import StringField, PasswordField, SelectField, IntegerField, BooleanField, FileField, TextAreaField, SubmitField
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, NumberRange, Length
+from wtforms import StringField, PasswordField, SelectField, IntegerField, FileField, SubmitField
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, NumberRange
 from app.models import User
-
-class LoginForm(FlaskForm):
-    login = StringField('Login', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    remember_me = BooleanField('Remember me')
-    submit = SubmitField('Sign In')
 
 class RegistrationForm(FlaskForm):
     login = StringField('Login', validators=[DataRequired()])
@@ -27,16 +21,3 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(login=login.data).first()
         if user is not None:
             raise ValidationError('Please use a different login')
-
-class EditProfileForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    name = StringField('Name', validators=[DataRequired()])
-    surname = StringField('Surname', validators=[DataRequired()])
-    age = IntegerField('Age', validators=[DataRequired(), NumberRange(1, 100, 'Invalid age')])
-    city = StringField('City', validators=[DataRequired()])
-    submit = SubmitField('Submit')
-
-class AddPostForm(FlaskForm):
-    text = TextAreaField('Text', validators=[DataRequired(), Length(3, 500, 'Invalid post length')])
-    img = FileField('Attach image', validators=[FileAllowed(['jpg'], 'Images only')])
-    submit = SubmitField('Submit')

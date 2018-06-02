@@ -1,22 +1,24 @@
-{% set author_info = post.author_info() %}
-{% set img_url = post.img_url() %}
+{% set author_info = post['root'].author_info() %}
+{% set img_url = post['root'].img_url() %}
 
 <div class="media bg-white border rounded-right p-2 mt-3">
     <a href="{{ author_info['url'] }}">
-        <img class="mr-3 rounded-circle" src="{{ post.author_avatar_url() }}" alt="Author" style="width: 64px; height: 64px">
+        <img class="mr-3 rounded-circle" src="{{ post['root'].author_avatar_url() }}" alt="Author" style="width: 64px; height: 64px">
     </a>
     <div class="media-body">
         <div style="min-height: 30px;">
-            {{ post.text | safe }}<br>
+            {{ post['root'].text | safe }}<br>
             {% if img_url is not none %}
                 <img class="rounded mt-1" src="{{ img_url }}" alt="Post image" style="width: 100%;"><br>
             {% endif %}
         </div>
         <div class="mt-2">
-            <span class="badge badge-pill badge-primary">{{ post.timestamp }}</span>
+            <span class="badge badge-pill badge-primary">{{ post['root'].timestamp }}</span>
             <a href="{{ author_info['url'] }}">
                 <span class="badge badge-pill badge-primary">{{ author_info['login'] | safe }}</span>
             </a>
         </div>
+
+        {% include  '_comments.html' %}
     </div>
 </div>

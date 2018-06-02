@@ -1,0 +1,39 @@
+{% for i in range(0, post['comments'] | length) %}
+    {% set comment = post['comments'][i] %}
+    {% set curr_level = post['comments'][i - 1].level if i > 0 else 0%}
+    {% set comment_author_info = user_info(comment['author']) %}
+    {% set comment_img_url = post_img_url(comment['id']) %}
+
+    {% if comment['level'] < curr_level %}
+        {% for i in range(0, curr_level - comment.level + 1) %}
+            </div></div>
+        {% endfor %} 
+    {% elif comment['level'] == curr_level %}
+        </div></div>
+    {% endif %}
+    
+    <div class="media bg-white border rounded-right p-2 mt-3">
+        <a href="{{ comment_author_info['url'] }}">
+            <img class="mr-3 rounded-circle" src="{{ user_avatar_url(comment['author']) }}" alt="Author" style="width: 64px; height: 64px">
+        </a>
+        <div class="media-body">
+            <div style="min-height: 30px;">
+                {{ comment['text'] | safe }}<br>
+                {% if comment_img_url is not none %}
+                    <img class="rounded mt-1" src="{{ comment_img_url }}" alt="Post image" style="width: 100%;"><br>
+                {% endif %}
+            </div>
+            <div class="mt-2">
+                <span class="badge badge-pill badge-primary">{{ comment['timestamp'] }}</span>
+                <a href="{{ comment_author_info['url'] }}">
+                    <span class="badge badge-pill badge-primary">{{ comment_author_info['login'] | safe }}</span>
+                </a>
+            </div>
+
+    {% if i == post['comments'] | length - 1%}
+        {% for i in range(0, comment['level']) %}
+            </div></div>
+        {% endfor %}
+    {% endif %}
+{% endfor %}
+

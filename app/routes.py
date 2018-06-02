@@ -1,12 +1,17 @@
 import os
+from datetime import datetime
+from sqlalchemy import text
 from flask import render_template, flash, redirect, url_for, request, send_from_directory
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
-from datetime import datetime
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, AddPostForm
+from app.forms.AddPostForm import AddPostForm
+from app.forms.EditProfileForm import EditProfileForm
+from app.forms.LoginForm import LoginForm
+from app.forms.RegistrationForm import RegistrationForm
 from app.models import User, Post
+from app.models import user_avatar_url, user_info, post_img_url
 
 @app.before_request
 def before_request():
@@ -33,10 +38,20 @@ def index():
         if add_post_form.img.data:
             save_file(post.id, 'POSTS_IMG_FOLDER', request.files['img'])
 
-    if current_user.is_authenticated:
-        posts = Post.query.order_by(Post.timestamp.desc()).all()
+    root_posts = Post.query.filter(Post.parent_post.is_(None)).order_by(Post.timestamp.desc())
+    posts = []
+    for root in root_posts:
+        query = text('SELECT get_comments({}); FETCH ALL IN _result;'.format(root.id))
+        result = db.engine.execute(query)
+        comments = []
+        for row in result:
+            comments.append(row)
+        
+        comments = comments[1:len(comments)]
+        posts.append(dict(root=root, comments=comments))
 
-    return render_template('index.html', title='Home', add_post_form=add_post_form, posts=posts)
+    return render_template('index.html', title='Home', add_post_form=add_post_form, posts=posts,
+        user_avatar_url=user_avatar_url, user_info=user_info, post_img_url=post_img_url)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
