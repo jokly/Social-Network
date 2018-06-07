@@ -6,14 +6,14 @@ DECLARE
 BEGIN
 	OPEN _result FOR 
     WITH RECURSIVE r AS (
-        SELECT post.id, post.parent_post, post.text, 0 as level,
+        SELECT post.id, post.parent_post, post.text, post.timestamp, post.author, 0 as level,
         post.id || '' as path
         FROM post
         WHERE post.id = curr_post_id
         
         UNION
         
-        SELECT post.id, post.parent_post, post.text, r.level + 1 as level,
+        SELECT post.id, post.parent_post, post.text, post.timestamp, post.author, r.level + 1 as level,
         r.path || post.id as path
         FROM post
             JOIN r
