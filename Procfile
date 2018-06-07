@@ -1,0 +1,1 @@
+web: flask db upgrade; gunicorn heroku_app:app
