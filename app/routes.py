@@ -24,19 +24,22 @@ def save_file(file_name, file_folder, file_data):
     img_path = os.path.join(app.config[file_folder], file_name)
     file_data.save(img_path)
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
     add_post_form = AddPostForm()
 
     if add_post_form.validate_on_submit():
-        post = Post(text=add_post_form.text.data, author=current_user.id)
+        parent_post_id = None if add_post_form.post_id.data == 'None' else add_post_form.post_id.data
+        post = Post(text=add_post_form.text.data, author=current_user.id, parent_post=parent_post_id)
         db.session.add(post)
         db.session.commit()
 
         if add_post_form.img.data:
             save_file(post.id, 'POSTS_IMG_FOLDER', request.files['img'])
+
+        return redirect(url_for('index'))
 
     root_posts = Post.query.filter(Post.parent_post.is_(None)).order_by(Post.timestamp.desc())
     posts = []

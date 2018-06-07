@@ -13,6 +13,7 @@
                     <div class="modal-body">
                         {{ add_post_form.hidden_tag() }}
 
+                        {{ macros.render_field(add_post_form.post_id, with_label=False) }}
                         {{ macros.render_field(add_post_form.text, with_label=True) }}
                         {{ macros.render_field(add_post_form.img, with_label=True) }}
                     </div>

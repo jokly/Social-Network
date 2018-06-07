@@ -14,7 +14,7 @@
     
     <div class="media bg-white border rounded-right p-2 mt-3">
         <a href="{{ comment_author_info['url'] }}">
-            <img class="mr-3 rounded-circle" src="{{ user_avatar_url(comment['author']) }}" alt="Author" style="width: 64px; height: 64px">
+            <img class="mr-3 rounded-circle" src="{{ user_avatar_url(comment['author']) }}" alt="Author" style="width: 32px; height: 32px">
         </a>
         <div class="media-body">
             <div style="min-height: 30px;">
@@ -28,6 +28,9 @@
                 <a href="{{ comment_author_info['url'] }}">
                     <span class="badge badge-pill badge-primary">{{ comment_author_info['login'] | safe }}</span>
                 </a>
+                <small class="float-right">
+                    <a href="#" post-id="{{ comment['id'] }}" data-toggle="modal" data-target="#add_post_form" data-post-id="{{ comment['id'] }}">Reply</a>
+                </small>
             </div>
 
     {% if i == post['comments'] | length - 1%}
