@@ -9,7 +9,7 @@
         <div style="min-height: 30px;">
             {{ post['root'].text | safe }}<br>
             {% if img_url is not none %}
-                <img class="rounded mt-1" src="{{ img_url }}" alt="Post image" style="width: 100%;"><br>
+                <img class="rounded mt-1" src="{{ img_url }}" alt="Post image" style="max-height: 200px"><br>
             {% endif %}
         </div>
         <div class="mt-2">
