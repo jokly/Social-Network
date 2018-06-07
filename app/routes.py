@@ -21,6 +21,10 @@ def before_request():
 
 def save_file(file_name, file_folder, file_data):
     file_name = '{}.jpg'.format(file_name)
+    
+    if not os.path.exists(app.config[file_folder]):
+        os.makedirs(app.config[file_folder])
+
     img_path = os.path.join(app.config[file_folder], file_name)
     file_data.save(img_path)
 
