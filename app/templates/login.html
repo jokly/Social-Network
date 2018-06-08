@@ -8,7 +8,7 @@
     <div class="row justify-content-center mb-3">
         <div class="col-5">
             {% for soc in socials %}
-                <a href="{{ soc.url }}/api/login?redirect_url={{ url_for('accept_social_login', sn_name=soc.name, _external=True) }}" class="btn btn-primary btn-block">{{ soc.name }}</a>
+                <a href="{{ soc.url }}/api/login?redirect_url={{ url_for('accept_social_login', sn_name=soc.name, _external=True) + "&service_id=vl-social" }}" class="btn btn-primary btn-block">{{ soc.name }}</a>
             {% endfor %}
         </div>
     </div>
