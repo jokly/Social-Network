@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% import '_macros.html' as macros %}
+
+{% block content %}
+<div class="container mt-5">
+    {% include '_flash.html' %}
+
+    <div class="row justify-content-center">
+        <div class="col-5 bg-white rounded pt-2">
+            {% if bad_response %}
+                <h3 class="text-center">Bad response</h3>
+            {% else %}
+                <form action="" method="post">
+                    <h3 class="text-center mb-4">Login with {{ sn_name }}</h3>
+                    {{ macros.render_field(form.submit, class="btn btn-primary btn-block") }}
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

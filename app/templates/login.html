@@ -5,6 +5,13 @@
 <div class="container mt-5">
     {% include '_flash.html' %}
 
+    <div class="row justify-content-center mb-3">
+        <div class="col-5">
+            {% for soc in socials %}
+                <a href="{{ soc.url }}/api/login?redirect_url={{ url_for('accept_social_login', sn_name=soc.name, _external=True) }}" class="btn btn-primary btn-block">{{ soc.name }}</a>
+            {% endfor %}
+        </div>
+    </div>
     <div class="row justify-content-center">
         <form class="col-5 bg-white rounded pt-2" action="" method="post">
             {{ form.hidden_tag() }}

@@ -1,6 +1,8 @@
 import os
 import urllib
 from datetime import datetime
+import requests
+import uuid
 from sqlalchemy import text
 from flask import render_template, flash, redirect, url_for, request, send_from_directory, jsonify
 from flask_login import current_user, login_user, logout_user, login_required
@@ -10,7 +12,7 @@ from app import app, db
 from app.forms.AddPostForm import AddPostForm
 from app.forms.EditProfileForm import EditProfileForm
 from app.forms.LoginForm import LoginForm
-from app.forms.OAuthLoginForm import OAuthLoginForm, OAuthGetAccessForm
+from app.forms.OAuthLoginForm import OAuthLoginForm, OAuthGetAccessForm, AcceptOAuth
 from app.forms.RegistrationForm import RegistrationForm
 from app.models import User, Post
 from app.models import ExternalSocialNetwork, ExternalSocialNetworkSession, AuthorizationCode, AccessToken
@@ -73,6 +75,8 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
 
+    socials = ExternalSocialNetwork.query.all()
+
     form = LoginForm()
 
     if form.validate_on_submit():
@@ -90,7 +94,7 @@ def login():
 
         return redirect(next_page)
 
-    return render_template('login.html', title='Log In', form=form)
+    return render_template('login.html', title='Log In', socials=socials, form=form)
 
 @app.route('/logout')
 def logout():
@@ -131,7 +135,7 @@ def uploaded_file(file_path):
 @login_required
 def user(login):
     user = User.query.filter_by(login=login).first_or_404()
-    page_title = user.name + ' ' + user.surname
+    page_title = user.login
 
     root_posts = Post.query.filter(Post.author == current_user.id).order_by(Post.timestamp.desc())
     posts = get_posts(root_posts)
@@ -172,7 +176,7 @@ def api_login():
 
     next_page = request.args.get('redirect_url')
     if not next_page:
-        next_page = url_for('index')
+        next_page = None
 
     if form.validate_on_submit():
         if current_user.is_authenticated:
@@ -190,7 +194,7 @@ def api_login():
 
     return render_template('oauth_login.html', title='SocialNetwork', form=form, next_page=next_page)
 
-@app.route('/api/get_token', methods=['GET', 'POST'])
+@app.route('/api/token', methods=['GET', 'POST'])
 def get_token():
     code = request.args.get('auth_code')
     service_id = request.args.get('service_id')
@@ -228,3 +232,43 @@ def get_profile_info(user_id):
     user = User.query.filter_by(id=user_id).first()
 
     return jsonify(status='ok', login=user.login, email=user.email)
+
+@app.route('/api/posts/<user_id>', methods=['GET', 'POSTS'])
+def api_get_posts(user_id):
+    pass
+
+@app.route('/accept_social_login/<sn_name>', methods=['GET', 'POST'])
+def accept_social_login(sn_name):
+    auth_code = request.args.get('auth_code')
+
+    if auth_code is None:
+        return render_template('accept_social_login.html', bad_response=True)
+
+    form = AcceptOAuth()
+
+    if form.is_submitted():
+        service = ExternalSocialNetwork.query.filter_by(name=sn_name).first()
+
+        if service is None:
+            return render_template('accept_social_login.html', bad_response=True)
+
+        token = requests.post('{}/api/token?service_id={}&auth_code={}'.format(service.url, 'vl-social', auth_code))
+        token = token.json()    
+        
+        if token['status'] == 'error':
+            return render_template('accept_social_login.html', bad_response=True)
+        
+        new_user = User(login=uuid.uuid4())
+        new_user.set_password(str(uuid.uuid4()))
+        external_sn = ExternalSocialNetworkSession(user=new_user.id, access_token=token['token'],
+            ext_uid=token['user_id'], ext_social_network=service.id)
+        
+        db.session.add(new_user)
+        db.session.add(external_sn)
+        db.session.commit()
+
+        login_user(new_user)
+
+        return redirect(url_for('index'))
+
+    return render_template('accept_social_login.html', title='Accept Login', form=form, sn_name=sn_name)
