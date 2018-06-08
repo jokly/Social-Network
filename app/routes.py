@@ -210,10 +210,9 @@ def get_token():
 
     return jsonify(status='ok', user_id=access_token.user_id, token=access_token.token)
 
-@app.route('/api/get_profile_info', methods=['GET', 'POST'])
-def get_profile_info():
+@app.route('/api/profile/<user_id>', methods=['GET', 'POST'])
+def get_profile_info(user_id):
     service_id = request.args.get('service_id')
-    user_id = request.args.get('user_id')
     token = request.args.get('token')
 
     if user_id is None or token is None or service_id is None:
