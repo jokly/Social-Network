@@ -135,7 +135,7 @@ def uploaded_file(file_path):
 @login_required
 def user(login):
     user = User.query.filter_by(login=login).first_or_404()
-    page_title = user.login
+    page_title = str(user.name) + ' ' + str(user.surname)
 
     root_posts = Post.query.filter(Post.author == current_user.id).order_by(Post.timestamp.desc())
     posts = get_posts(root_posts)
@@ -158,8 +158,8 @@ def edit_profile():
 
     return render_template('edit_profile.html', title='Edit profile', form=form, user=current_user)
 
-def get_auth_code():
-    auth_code = AuthorizationCode(user_id=current_user.id)
+def get_auth_code(service_id):
+    auth_code = AuthorizationCode(service_id=service_id, user_id=current_user.id)
     db.session.add(auth_code)
     db.session.commit()
 
@@ -175,12 +175,13 @@ def api_login():
         form = OAuthLoginForm()
 
     next_page = request.args.get('redirect_url')
-    if not next_page:
+    service_id = request.args.get('service_id')
+    if next_page is None or service_id is None:
         next_page = None
 
     if form.validate_on_submit():
         if current_user.is_authenticated:
-            return redirect('{}?auth_code={}'.format(next_page, get_auth_code()))
+            return redirect('{}?auth_code={}'.format(next_page, get_auth_code(service_id)))
 
         user = User.query.filter_by(login=form.login.data).first()
 
@@ -190,7 +191,7 @@ def api_login():
 
         login_user(user)
 
-        return redirect('{}?auth_code={}'.format(next_page, get_auth_code()))
+        return redirect('{}?auth_code={}'.format(next_page, get_auth_code(service_id)))
 
     return render_template('oauth_login.html', title='SocialNetwork', form=form, next_page=next_page)
 
@@ -202,7 +203,7 @@ def get_token():
     if code is None or service_id is None:
         return jsonify(status='error')
 
-    auth_code = AuthorizationCode.query.filter_by(code=code).first()
+    auth_code = AuthorizationCode.query.filter_by(service_id=service_id, code=code).first()
 
     if auth_code is None:
         return jsonify(status='error')
@@ -252,22 +253,27 @@ def accept_social_login(sn_name):
         if service is None:
             return render_template('accept_social_login.html', bad_response=True)
 
-        token = requests.post('{}/api/token?service_id={}&auth_code={}'.format(service.url, 'vl-social', auth_code))
-        token = token.json()    
+        token = requests.post('{}/api/token?service_id={}&auth_code={}'.format(service.url, 'vl-social', auth_code)).json() 
         
         if token['status'] == 'error':
             return render_template('accept_social_login.html', bad_response=True)
-        
-        new_user = User(login=uuid.uuid4())
-        new_user.set_password(str(uuid.uuid4()))
-        external_sn = ExternalSocialNetworkSession(user=new_user.id, access_token=token['token'],
-            ext_uid=token['user_id'], ext_social_network=service.id)
-        
-        db.session.add(new_user)
-        db.session.add(external_sn)
-        db.session.commit()
 
-        login_user(new_user)
+        external_token = ExternalSocialNetworkSession.query.filter_by(ext_uid=token['user_id'], ext_social_network=service.id).first()
+
+        if external_token is None:
+            new_user = User(login=uuid.uuid4())
+            new_user.set_password(str(uuid.uuid4()))
+            db.session.add(new_user)
+
+            login_user(new_user)
+
+            external_sn = ExternalSocialNetworkSession(user=current_user.id, access_token=token['token'],
+                ext_uid=token['user_id'], ext_social_network=service.id)
+            db.session.add(external_sn)
+            db.session.commit()
+        else:
+            user = User.query.filter_by(id=external_token.user).first()
+            login_user(user)
 
         return redirect(url_for('index'))
 
