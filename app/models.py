@@ -1,8 +1,9 @@
+import os
+from datetime import datetime
+import uuid
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from flask import url_for
-from datetime import datetime
-import os
 from app import db, login, app
 
 class User(UserMixin, db.Model):
@@ -74,3 +75,26 @@ def post_img_url(post_id):
         return None
 
     return url_for(app.config['STATIC_FOLDER'], filename='posts_img/' + file_name)
+
+class ExternalSocialNetwork(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(256), unique=True)
+    url = db.Column(db.String(256), unique=True)
+
+class ExternalSocialNetworkSession(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
+    access_token = db.Column(db.String(256))
+    ext_uid = db.Column(db.Integer)
+    ext_social_network = db.Column(db.Integer, db.ForeignKey('external_social_network.id', ondelete='CASCADE'))
+
+class AuthorizationCode(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
+    code = db.Column(db.String(256), default=uuid.uuid4())
+
+class AccessToken(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    service_id = db.Column(db.String(256), unique=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
+    token = db.Column(db.String(256), default=uuid.uuid4())

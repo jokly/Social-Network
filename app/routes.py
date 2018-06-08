@@ -1,7 +1,8 @@
 import os
+import urllib
 from datetime import datetime
 from sqlalchemy import text
-from flask import render_template, flash, redirect, url_for, request, send_from_directory
+from flask import render_template, flash, redirect, url_for, request, send_from_directory, jsonify
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
@@ -12,6 +13,7 @@ from app.forms.LoginForm import LoginForm
 from app.forms.OAuthLoginForm import OAuthLoginForm, OAuthGetAccessForm
 from app.forms.RegistrationForm import RegistrationForm
 from app.models import User, Post
+from app.models import ExternalSocialNetwork, ExternalSocialNetworkSession, AuthorizationCode, AccessToken
 from app.models import user_avatar_url, user_info, post_img_url
 
 @app.before_request
@@ -28,6 +30,20 @@ def save_file(file_name, file_folder, file_data):
 
     img_path = os.path.join(app.config[file_folder], file_name)
     file_data.save(img_path)
+
+def get_posts(root_posts):
+    posts = []
+    for root in root_posts:
+        query = text('SELECT get_comments({}); FETCH ALL IN _result;'.format(root.id))
+        result = db.engine.execute(query)
+        comments = []
+        for row in result:
+            comments.append(row)
+        
+        comments = comments[1:len(comments)]
+        posts.append(dict(root=root, comments=comments))
+
+    return posts
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -47,16 +63,7 @@ def index():
         return redirect(url_for('index'))
 
     root_posts = Post.query.filter(Post.parent_post.is_(None)).order_by(Post.timestamp.desc())
-    posts = []
-    for root in root_posts:
-        query = text('SELECT get_comments({}); FETCH ALL IN _result;'.format(root.id))
-        result = db.engine.execute(query)
-        comments = []
-        for row in result:
-            comments.append(row)
-        
-        comments = comments[1:len(comments)]
-        posts.append(dict(root=root, comments=comments))
+    posts = get_posts(root_posts)
 
     return render_template('index.html', title='Home', add_post_form=add_post_form, posts=posts,
         user_avatar_url=user_avatar_url, user_info=user_info, post_img_url=post_img_url)
@@ -126,7 +133,11 @@ def user(login):
     user = User.query.filter_by(login=login).first_or_404()
     page_title = user.name + ' ' + user.surname
 
-    return render_template('user.html', title=page_title, user=user)
+    root_posts = Post.query.filter(Post.author == current_user.id).order_by(Post.timestamp.desc())
+    posts = get_posts(root_posts)
+
+    return render_template('user.html', title=page_title, user=user, posts=posts,
+        user_avatar_url=user_avatar_url, user_info=user_info, post_img_url=post_img_url)
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
@@ -143,6 +154,13 @@ def edit_profile():
 
     return render_template('edit_profile.html', title='Edit profile', form=form, user=current_user)
 
+def get_auth_code():
+    auth_code = AuthorizationCode(user_id=current_user.id)
+    db.session.add(auth_code)
+    db.session.commit()
+
+    return auth_code.code
+
 @app.route('/api/login', methods=['GET', 'POST'])
 def api_login():
     form = None
@@ -152,24 +170,62 @@ def api_login():
     else:
         form = OAuthLoginForm()
 
-    next_page = request.args.get('next')
+    next_page = request.args.get('redirect_url')
     if not next_page:
         next_page = url_for('index')
 
     if form.validate_on_submit():
-        redirect_url = '{}?token={}'.format(next_page, 'help')
-
         if current_user.is_authenticated:
-            return redirect(redirect_url)
+            return redirect('{}?auth_code={}'.format(next_page, get_auth_code()))
 
         user = User.query.filter_by(login=form.login.data).first()
 
         if user is None or not user.check_password(form.password.data):
             flash('Invalid login or password')
-            return redirect(url_for('api_login'))
+            return redirect('{}?redirect_url={}'.format(url_for('api_login'), next_page))
 
         login_user(user)
 
-        return redirect(redirect_url)
+        return redirect('{}?auth_code={}'.format(next_page, get_auth_code()))
 
-    return render_template('oauth_login.html', title='SocialNetwork', form=form, auth_site=next_page)
+    return render_template('oauth_login.html', title='SocialNetwork', form=form, next_page=next_page)
+
+@app.route('/api/get_token', methods=['GET', 'POST'])
+def get_token():
+    code = request.args.get('auth_code')
+    service_id = request.args.get('service_id')
+
+    if code is None or service_id is None:
+        return jsonify(status='error')
+
+    auth_code = AuthorizationCode.query.filter_by(code=code).first()
+
+    if auth_code is None:
+        return jsonify(status='error')
+
+    access_token = AccessToken(user_id=auth_code.user_id, service_id=service_id)
+    db.session.add(access_token)
+    db.session.delete(auth_code)
+    db.session.commit()
+
+    return jsonify(status='ok', user_id=access_token.user_id, token=access_token.token)
+
+@app.route('/api/get_profile_info', methods=['GET', 'POST'])
+def get_profile_info():
+    service_id = request.args.get('service_id')
+    user_id = request.args.get('user_id')
+    token = request.args.get('token')
+
+    if user_id is None or token is None or service_id is None:
+        return jsonify(status='error')
+
+    access_token = AccessToken.query.filter_by(service_id=service_id, user_id=user_id).first()
+
+    if access_token is None:
+        return jsonify(status='error')
+    if access_token.token != token:
+        return jsonify(status='error')
+
+    user = User.query.filter_by(id=user_id).first()
+
+    return jsonify(status='ok', login=user.login, email=user.email)

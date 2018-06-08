@@ -32,5 +32,13 @@
             </div>
         </div>
     </div>
+
+    <div class="row justify-content-center">    
+        <div class="col-8 mt-5 mb-5">
+            {% for post in posts %}
+                {% include '_post.html' %}
+            {% endfor %}
+        </div>
+    </div>
 </div>
 {% endblock %}
