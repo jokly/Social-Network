@@ -9,6 +9,7 @@ from app import app, db
 from app.forms.AddPostForm import AddPostForm
 from app.forms.EditProfileForm import EditProfileForm
 from app.forms.LoginForm import LoginForm
+from app.forms.OAuthLoginForm import OAuthLoginForm, OAuthGetAccessForm
 from app.forms.RegistrationForm import RegistrationForm
 from app.models import User, Post
 from app.models import user_avatar_url, user_info, post_img_url
@@ -141,3 +142,34 @@ def edit_profile():
         return redirect(url_for('user', login=current_user.login))
 
     return render_template('edit_profile.html', title='Edit profile', form=form, user=current_user)
+
+@app.route('/api/login', methods=['GET', 'POST'])
+def api_login():
+    form = None
+
+    if current_user.is_authenticated:
+        form = OAuthGetAccessForm()
+    else:
+        form = OAuthLoginForm()
+
+    next_page = request.args.get('next')
+    if not next_page:
+        next_page = url_for('index')
+
+    if form.validate_on_submit():
+        redirect_url = '{}?token={}'.format(next_page, 'help')
+
+        if current_user.is_authenticated:
+            return redirect(redirect_url)
+
+        user = User.query.filter_by(login=form.login.data).first()
+
+        if user is None or not user.check_password(form.password.data):
+            flash('Invalid login or password')
+            return redirect(url_for('api_login'))
+
+        login_user(user)
+
+        return redirect(redirect_url)
+
+    return render_template('oauth_login.html', title='SocialNetwork', form=form, auth_site=next_page)

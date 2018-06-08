@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% import '_macros.html' as macros %}
+
+{% block content %}
+<div class="container mt-5">
+    {% include '_flash.html' %}
+
+    <div class="row justify-content-center">
+        <form class="col-5 bg-white rounded pt-2" action="" method="post">
+            <div class="text-center mt-2 mb-4">
+                <h3>Access to: <a href="{{ auth_site }}">{{ auth_site }}</a></h3>
+            </div>
+            {% if current_user.is_anonymous %}
+                {{ form.hidden_tag() }}
+                {{ macros.render_field(form.login, with_label=True) }}
+                {{ macros.render_field(form.password, with_label=True) }}
+                {{ macros.render_field(form.submit) }}
+            {% else %}
+                {{ form.hidden_tag() }}
+                {{ macros.render_field(form.get_access, class="btn btn-primary d-block mx-auto") }}
+            {% endif %}
+        </form>
+    </div>
+</div>
+{% endblock %}
