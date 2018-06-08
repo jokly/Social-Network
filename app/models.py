@@ -90,12 +90,12 @@ class ExternalSocialNetworkSession(db.Model):
 
 class AuthorizationCode(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    service_id = db.Column(db.String(256), unique=True)
+    service_id = db.Column(db.String(256), unique=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
     code = db.Column(db.String(256), default=uuid.uuid4())
 
 class AccessToken(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    service_id = db.Column(db.String(256), unique=True)
+    service_id = db.Column(db.String(256), unique=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
     token = db.Column(db.String(256), default=uuid.uuid4())
