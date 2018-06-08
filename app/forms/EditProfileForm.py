@@ -3,6 +3,7 @@ from wtforms import StringField, IntegerField, SubmitField
 from wtforms.validators import DataRequired, Email, NumberRange
 
 class EditProfileForm(FlaskForm):
+    login = StringField('Login', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     name = StringField('Name', validators=[DataRequired()])
     surname = StringField('Surname', validators=[DataRequired()])

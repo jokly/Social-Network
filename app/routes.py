@@ -149,7 +149,7 @@ def edit_profile():
     form = EditProfileForm()
 
     if form.validate_on_submit():
-        User.query.filter_by(id=current_user.id).update(dict(email=form.email.data,
+        User.query.filter_by(id=current_user.id).update(dict(login=form.login.data, email=form.email.data,
             name=form.name.data, surname=form.surname.data, age=form.age.data, city=form.city.data))
         
         db.session.commit()
