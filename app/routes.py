@@ -223,11 +223,9 @@ def get_profile_info(user_id):
     if user_id is None or token is None or service_id is None:
         return jsonify(status='error')
 
-    access_token = AccessToken.query.filter_by(service_id=service_id, user_id=user_id).first()
+    access_token = AccessToken.query.filter_by(service_id=service_id, user_id=user_id, token=token).first()
 
     if access_token is None:
-        return jsonify(status='error')
-    if access_token.token != token:
         return jsonify(status='error')
 
     user = User.query.filter_by(id=user_id).first()
