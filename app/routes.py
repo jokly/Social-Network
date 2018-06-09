@@ -264,6 +264,7 @@ def accept_social_login(sn_name):
             new_user = User(login=uuid.uuid4())
             new_user.set_password(str(uuid.uuid4()))
             db.session.add(new_user)
+            db.session.commit()
 
             login_user(new_user)
 
