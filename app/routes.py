@@ -217,8 +217,8 @@ def get_token():
 
 @app.route('/api/profile/<user_id>', methods=['GET', 'POST'])
 def get_profile_info(user_id):
-    service_id = request.form.get('service_id')
-    token = request.form.get('token')
+    service_id = request.args.get('service_id')
+    token = request.args.get('token')
 
     if user_id is None or token is None or service_id is None:
         return jsonify(status='error')
