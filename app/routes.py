@@ -197,8 +197,8 @@ def api_login():
 
 @app.route('/api/token', methods=['GET', 'POST'])
 def get_token():
-    code = request.args.get('auth_code')
-    service_id = request.args.get('service_id')
+    code = request.form.get('auth_code')
+    service_id = request.form.get('service_id')
 
     if code is None or service_id is None:
         return jsonify(status='error')
@@ -217,8 +217,8 @@ def get_token():
 
 @app.route('/api/profile/<user_id>', methods=['GET', 'POST'])
 def get_profile_info(user_id):
-    service_id = request.args.get('service_id')
-    token = request.args.get('token')
+    service_id = request.form.get('service_id')
+    token = request.form.get('token')
 
     if user_id is None or token is None or service_id is None:
         return jsonify(status='error')
@@ -236,7 +236,10 @@ def get_profile_info(user_id):
 
 @app.route('/api/posts/<user_id>', methods=['GET', 'POSTS'])
 def api_get_posts(user_id):
-    pass
+    service_id = request.args.get('service_id')
+
+    if service_id is None:
+        return jsonify(status='error')
 
 @app.route('/accept_social_login/<sn_name>', methods=['GET', 'POST'])
 def accept_social_login(sn_name):
@@ -253,7 +256,8 @@ def accept_social_login(sn_name):
         if service is None:
             return render_template('accept_social_login.html', bad_response=True)
 
-        token = requests.post('{}/api/token?service_id={}&auth_code={}'.format(service.url, 'vl-social', auth_code)).json() 
+        token = requests.post('{}/api/token',
+            data={'service_id': 'vl-social', 'auth_code': auth_code}).json()
         
         if token['status'] == 'error':
             return render_template('accept_social_login.html', bad_response=True)
