@@ -254,7 +254,7 @@ def accept_social_login(sn_name):
         if service is None:
             return render_template('accept_social_login.html', bad_response=True)
 
-        token = requests.post('{}/api/token',
+        token = requests.post('{}/api/token'.format(service.url),
             data={'service_id': 'vl-social', 'auth_code': auth_code}).json()
         
         if token['status'] == 'error':
