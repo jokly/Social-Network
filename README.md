@@ -11,7 +11,7 @@
 
 2. Get token `POST`
 
-    Request: `/api/token?auth_code=<auth code>&service_id=<your unique service id>`
+    Request: `/api/token`
 
     ```post
     service_id=<your unique service id>
