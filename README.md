@@ -4,11 +4,20 @@
 ## API
 
 1. Authorization
-    Request: `/api/login?service_id=<your unique service id>&redirect_url=<url to redirect>`
-    Response: `<url to redirect>?auth_code=<auth code>`
 
-2. Get token
+    Redirect to url: `/api/login?service_id=<your unique service id>&redirect_url=<url to redirect>`
+
+    Answer redirect to url: `<url to redirect>?auth_code=<auth code>`
+
+2. Get token `POST`
+
     Request: `/api/token?auth_code=<auth code>&service_id=<your unique service id>`
+
+    ```post
+    service_id=<your unique service id>
+    auth_code=<auth code from "1. Authorization">
+    ```
+
     Response: JSON
     ```json
     {
@@ -21,8 +30,10 @@
     }
     ```
 
-3. Get profile info
+3. Get profile info `GET`
+
     Request: `/api/profile/<user_id>?service_id=<your unique service id>&token=<token>`
+
     Response: JSON
 
     ```json
@@ -36,15 +47,12 @@
     }
     ```
 
-4. Get user posts
-    Request: `/api/posts/<user_id>?token=<token>`
-    Response: JSON
+## How its works
 
-    ```json
-    posts: [
-        {
-            "text": "<post text>",
-            "date": "<post date>"
-        }
-    ]
-    ```
+1. Получаем уникальный код по `1` пункту.
+
+2. Далее получаем токен (который в дальнейшем и будет нам давать доступ к информации из другой социальной сети).
+   Чтобы его получить, необходимо отправить код, полученный выше и уникальный ID вашего сайта (ГЛАВНОЕ! уникальный,
+   выбираем его сами).
+
+3. Далее по токену и ID сайта получаем профиль пользователя.
